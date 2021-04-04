@@ -100,25 +100,14 @@ var map = new ol.Map({
     overlays: [overlayPopup],
     layers: layersList,
     view: new ol.View({
-         maxZoom: 26, minZoom: 1
+         maxZoom: 20, minZoom: 1
     })
 });
 
+var layerSwitcher = new ol.control.LayerSwitcher({tipLabel: "Layers"});
+map.addControl(layerSwitcher);
 
-    var searchLayer = new SearchLayer({
-      layer: lyr_GBdistrict_borough_unitary_region_0,
-      colName: 'NAME',
-      zoom: 10,
-      collapsed: true,
-      map: map
-    });
-
-    map.addControl(searchLayer);
-    document.getElementsByClassName('search-layer')[0]
-    .getElementsByTagName('button')[0].className +=
-    ' fa fa-binoculars';
-    
-map.getView().fit([-421494.336817, 7503734.700769, -331847.010169, 7558782.421151], map.getSize());
+map.getView().fit([1460293.874361, 5681410.519149, 1870364.526882, 5927967.686655], map.getSize());
 
 var NO_POPUP = 0
 var ALL_FIELDS = 1
@@ -614,10 +603,6 @@ function createMeasureTooltip() {
 }
 
 
-function convertToFeet(length) {
-    feet_length = length * 3.2808;
-    return feet_length
-}
 
 /**
  * format length output
@@ -634,15 +619,15 @@ var formatLength = function(line) {
       var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, 'EPSG:4326');
       length += ol.sphere.getDistance(c1, c2);
     }
-    feet_length = convertToFeet(length)
-
-    var output;
-    if (feet_length > 5280) {
-        output = (Math.round(feet_length / 5280 * 100) / 100) + ' miles';
-    } else {
-        output = (Math.round(feet_length * 100) / 100) + ' ft';
-    }
-    return output;
+  var output;
+  if (length > 100) {
+    output = (Math.round(length / 1000 * 100) / 100) +
+        ' ' + 'km';
+  } else {
+    output = (Math.round(length * 100) / 100) +
+        ' ' + 'm';
+  }
+  return output;
 };
 
 addInteraction();
@@ -687,18 +672,35 @@ var geolocateOverlay = new ol.layer.Vector({
 geolocation.setTracking(true);
 
 
+var geocoder = new Geocoder('nominatim', {
+  provider: 'osm',
+  lang: 'en-US',
+  placeholder: 'Search for ...',
+  limit: 5,
+  keepOpen: true
+});
+map.addControl(geocoder);
+
+document.getElementsByClassName('gcd-gl-btn')[0].className += ' fa fa-search';
+
 var attributionComplete = false;
 map.on("rendercomplete", function(evt) {
     if (!attributionComplete) {
         var attribution = document.getElementsByClassName('ol-attribution')[0];
         var attributionList = attribution.getElementsByTagName('ul')[0];
         var firstLayerAttribution = attributionList.getElementsByTagName('li')[0];
+        var PeterKendaAttribution = document.createElement('li');
+        PeterKendaAttribution.innerHTML = '<a href="">Peter_Kenda</a> &middot; ';
+        var GURSAttribution = document.createElement('li');
+        GURSAttribution.innerHTML = '<a href="https://www.gov.si/drzavni-organi/organi-v-sestavi/geodetska-uprava">GURS</a> &middot; ';
         var qgis2webAttribution = document.createElement('li');
         qgis2webAttribution.innerHTML = '<a href="https://github.com/tomchadwin/qgis2web">qgis2web</a> &middot; ';
         var olAttribution = document.createElement('li');
         olAttribution.innerHTML = '<a href="https://openlayers.org/">OpenLayers</a> &middot; ';
         var qgisAttribution = document.createElement('li');
         qgisAttribution.innerHTML = '<a href="https://qgis.org/">QGIS</a>';
+        attributionList.insertBefore(PeterKendaAttribution, firstLayerAttribution);
+        attributionList.insertBefore(GURSAttribution, firstLayerAttribution);
         attributionList.insertBefore(qgis2webAttribution, firstLayerAttribution);
         attributionList.insertBefore(olAttribution, firstLayerAttribution);
         attributionList.insertBefore(qgisAttribution, firstLayerAttribution);
