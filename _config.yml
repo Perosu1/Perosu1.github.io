@@ -21,8 +21,8 @@
 title: Perosu1 / Peter Kenda
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
-**Under constuction.**
-If you are looking for the map that was on this address click [HERE](https://perosu1.github.io/SlovenianBordersMap/)
+Under constuction.
+If you are looking for the map that was on this address click https://perosu1.github.io/SlovenianBordersMap/
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  Perosu1
